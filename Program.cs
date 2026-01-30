@@ -18,7 +18,6 @@ namespace rubiks_cube_simulator
             this.z = z;
         }
 
-        //FIX: comparison of floating point numbers. how does -0 and 0 fare
         public static bool operator ==(Vec3 left, Vec3 right) =>
             ((left.x == right.x) && (left.y == right.y) && (left.z == right.z));
 
@@ -92,7 +91,7 @@ namespace rubiks_cube_simulator
             _secondaryVec = v2;
         }
 
-        public Color[] getColors()
+        public virtual Color[] getColors()
         {
             return new Color[] { _firstCol, _secondCol };
         }
@@ -159,7 +158,7 @@ namespace rubiks_cube_simulator
 
         public Corner() { }
 
-        public new Color[] getColors()
+        public override Color[] getColors()
         {
             return new Color[] { _firstCol, _secondCol, _thirdCol };
         }
@@ -177,6 +176,7 @@ namespace rubiks_cube_simulator
     class Cube
     {
         private Block[] _blocks = new Block[20];
+        private string _face = "  ";
 
         public Block getBlock(int index)
         {
@@ -396,8 +396,8 @@ namespace rubiks_cube_simulator
         public void rotateRight()
         {
             // edges
-            var tmp = _blocks[4];
-            _blocks[4] = _blocks[9];
+            var tmp = _blocks[2];
+            _blocks[2] = _blocks[9];
             _blocks[9] = _blocks[14];
             _blocks[14] = _blocks[8];
             _blocks[8] = tmp;
@@ -535,7 +535,7 @@ namespace rubiks_cube_simulator
 
             // Console.ResetColor();
             Console.BackgroundColor = cc;
-            Console.Write("  ");
+            Console.Write(_face);
             Console.ResetColor();
         }
 
@@ -587,19 +587,19 @@ namespace rubiks_cube_simulator
             Console.ResetColor();
 
             // blue face
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(19, new Vec3(0, -1, 0)));
             this.printColBlock(this.getFaceCol(12, new Vec3(0, -1, 0)));
             this.printColBlock(this.getFaceCol(13, new Vec3(0, -1, 0)));
             Console.WriteLine("");
 
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(11, new Vec3(0, -1, 0)));
             this.printColBlock(Color.Blue);
             this.printColBlock(this.getFaceCol(8, new Vec3(0, -1, 0)));
             Console.WriteLine("");
 
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(7, new Vec3(0, -1, 0)));
             this.printColBlock(this.getFaceCol(0, new Vec3(0, -1, 0)));
             this.printColBlock(this.getFaceCol(1, new Vec3(0, -1, 0)));
@@ -660,19 +660,19 @@ namespace rubiks_cube_simulator
             Console.WriteLine("");
 
             // blue face
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(5, new Vec3(0, 1, 0)));
             this.printColBlock(this.getFaceCol(4, new Vec3(0, 1, 0)));
             this.printColBlock(this.getFaceCol(3, new Vec3(0, 1, 0)));
             Console.WriteLine("");
 
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(10, new Vec3(0, 1, 0)));
             this.printColBlock(Color.Green);
             this.printColBlock(this.getFaceCol(9, new Vec3(0, 1, 0)));
             Console.WriteLine("");
 
-            Console.Write("      ");
+            Console.Write($"{_face}{_face}{_face}");
             this.printColBlock(this.getFaceCol(17, new Vec3(0, 1, 0)));
             this.printColBlock(this.getFaceCol(16, new Vec3(0, 1, 0)));
             this.printColBlock(this.getFaceCol(15, new Vec3(0, 1, 0)));
@@ -685,6 +685,7 @@ namespace rubiks_cube_simulator
         static void Main(string[] args)
         {
             Cube cube = new Cube();
+            cube.rotateRight();
             cube.print();
         }
     }
