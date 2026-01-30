@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace rubiks_cube_simulator
@@ -190,7 +191,60 @@ namespace rubiks_cube_simulator
         }
 
         //TODO:
-        public void doAlgo(string algo) { }
+        public int doAlgo(string algo)
+        {
+            algo = algo.ToLower();
+            string[] a = new string[algo.Length];
+
+            for (int i = 0; i < algo.Length; ++i)
+            {
+                a[i] = $"{algo[i]}";
+            }
+
+            if (a[0] == "'")
+            {
+                return 0;
+            }
+
+            for (int i = 0; i < a.Length; ++i)
+            {
+                if (a[i] == "'")
+                {
+                    a[i] = $"{a[i - 1]}{a[i]}";
+                    a[i - 1] = ".";
+                }
+            }
+
+            foreach (string s in a)
+            {
+                if (s == "u")
+                    this.rotateUp();
+                else if (s == "d")
+                    this.rotateDown();
+                else if (s == "l")
+                    this.rotateLeft();
+                else if (s == "r")
+                    this.rotateRight();
+                else if (s == "f")
+                    this.rotateFront();
+                else if (s == "b")
+                    this.rotateBack();
+                else if (s[0] == 'u' && s[1] == '\'')
+                    this.rotateUpPrime();
+                else if (s[0] == 'd' && s[1] == '\'')
+                    this.rotateDownPrime();
+                else if (s[0] == 'l' && s[1] == '\'')
+                    this.rotateLeftPrime();
+                else if (s[0] == 'r' && s[1] == '\'')
+                    this.rotateRightPrime();
+                else if (s[0] == 'f' && s[1] == '\'')
+                    this.rotateFrontPrime();
+                else if (s[0] == 'b' && s[1] == '\'')
+                    this.rotateBackPrime();
+            }
+
+            return -1;
+        }
 
         public Cube(bool def = true)
         {
@@ -685,7 +739,8 @@ namespace rubiks_cube_simulator
         static void Main(string[] args)
         {
             Cube cube = new Cube();
-            cube.rotateRight();
+            // cube.doAlgo("RUR'URUUR'");
+            cube.doAlgo("RRLLFFBBUUDD");
             cube.print();
         }
     }
