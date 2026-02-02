@@ -142,6 +142,22 @@ namespace rubiks_cube_simulator
 
     class Edge : Block
     {
+        public static bool operator ==(Edge left, Edge right) =>
+            (
+                (left._firstCol == right._firstCol)
+                && (left._secondCol == right._secondCol)
+                && (left._primaryVec == right._primaryVec)
+                && (left._secondaryVec == right._secondaryVec)
+            );
+
+        public static bool operator !=(Edge left, Edge right) =>
+            (
+                (left._firstCol != right._firstCol)
+                && (left._secondCol != right._secondCol)
+                && (left._primaryVec != right._primaryVec)
+                && (left._secondaryVec != right._secondaryVec)
+            );
+
         public Edge() { }
 
         public Edge(Color[] colors, Vec3 v1, Vec3 v2)
@@ -156,6 +172,22 @@ namespace rubiks_cube_simulator
     class Corner : Block
     {
         private Color _thirdCol = Color.White;
+
+        public static bool operator ==(Corner left, Corner right) =>
+            (
+                (left._firstCol == right._firstCol)
+                && (left._secondCol == right._secondCol)
+                && (left._primaryVec == right._primaryVec)
+                && (left._secondaryVec == right._secondaryVec)
+            );
+
+        public static bool operator !=(Corner left, Corner right) =>
+            (
+                (left._firstCol != right._firstCol)
+                && (left._secondCol != right._secondCol)
+                && (left._primaryVec != right._primaryVec)
+                && (left._secondaryVec != right._secondaryVec)
+            );
 
         public Corner() { }
 
@@ -187,10 +219,16 @@ namespace rubiks_cube_simulator
         //TODO:
         public bool compare(Cube cube)
         {
-            return false;
+            for (int i = 0; i < _blocks.Length; ++i)
+            {
+                if (_blocks[i] != cube._blocks[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
-        //TODO:
         public int doAlgo(string algo)
         {
             algo = algo.ToLower();
@@ -246,138 +284,135 @@ namespace rubiks_cube_simulator
             return -1;
         }
 
-        public Cube(bool def = true)
+        public Cube()
         {
-            if (def)
+            Color[][] defaultCubeCol =
+            [
+                // first layer
+                [Color.White, Color.Blue],
+                [Color.White, Color.Blue, Color.Red],
+                [Color.White, Color.Red],
+                [Color.White, Color.Green, Color.Red],
+                [Color.White, Color.Green],
+                [Color.White, Color.Green, Color.Orange],
+                [Color.White, Color.Orange],
+                [Color.White, Color.Blue, Color.Orange],
+                // middle layer
+                [Color.Blue, Color.Red],
+                [Color.Green, Color.Red],
+                [Color.Green, Color.Orange],
+                [Color.Blue, Color.Orange],
+                // bottom layer
+                [Color.Yellow, Color.Blue],
+                [Color.Yellow, Color.Blue, Color.Red],
+                [Color.Yellow, Color.Red],
+                [Color.Yellow, Color.Green, Color.Red],
+                [Color.Yellow, Color.Green],
+                [Color.Yellow, Color.Green, Color.Orange],
+                [Color.Yellow, Color.Orange],
+                [Color.Yellow, Color.Blue, Color.Orange],
+            ];
+            float[][][] defaultCubeVec =
+            [
+                // first layer
+                [
+                    [1, 0, 0],
+                    [0, -1, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, -1, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 0, 1],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, 0, -1],
+                ],
+                [
+                    [1, 0, 0],
+                    [0, -1, 0],
+                ],
+                // middle layer
+                [
+                    [0, -1, 0],
+                    [0, 0, 1],
+                ],
+                [
+                    [0, 1, 0],
+                    [0, 0, 1],
+                ],
+                [
+                    [0, 1, 0],
+                    [0, 0, -1],
+                ],
+                [
+                    [0, -1, 0],
+                    [0, 0, -1],
+                ],
+                // bottom layer
+                [
+                    [-1, 0, 0],
+                    [0, -1, 0],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, -1, 0],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, 0, 1],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, 1, 0],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, 0, -1],
+                ],
+                [
+                    [-1, 0, 0],
+                    [0, -1, 0],
+                ],
+            ];
+            Debug.Assert(defaultCubeCol.Length == defaultCubeVec.Length);
+            Debug.Assert(defaultCubeCol.Length == 20);
+            for (int i = 0; i < defaultCubeCol.Length; ++i)
             {
-                Color[][] defaultCubeCol =
-                [
-                    // first layer
-                    [Color.White, Color.Blue],
-                    [Color.White, Color.Blue, Color.Red],
-                    [Color.White, Color.Red],
-                    [Color.White, Color.Green, Color.Red],
-                    [Color.White, Color.Green],
-                    [Color.White, Color.Green, Color.Orange],
-                    [Color.White, Color.Orange],
-                    [Color.White, Color.Blue, Color.Orange],
-                    // middle layer
-                    [Color.Blue, Color.Red],
-                    [Color.Green, Color.Red],
-                    [Color.Green, Color.Orange],
-                    [Color.Blue, Color.Orange],
-                    // bottom layer
-                    [Color.Yellow, Color.Blue],
-                    [Color.Yellow, Color.Blue, Color.Red],
-                    [Color.Yellow, Color.Red],
-                    [Color.Yellow, Color.Green, Color.Red],
-                    [Color.Yellow, Color.Green],
-                    [Color.Yellow, Color.Green, Color.Orange],
-                    [Color.Yellow, Color.Orange],
-                    [Color.Yellow, Color.Blue, Color.Orange],
-                ];
-                float[][][] defaultCubeVec =
-                [
-                    // first layer
-                    [
-                        [1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, 0, 1],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, 0, -1],
-                    ],
-                    [
-                        [1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                    // middle layer
-                    [
-                        [0, -1, 0],
-                        [0, 0, 1],
-                    ],
-                    [
-                        [0, 1, 0],
-                        [0, 0, 1],
-                    ],
-                    [
-                        [0, 1, 0],
-                        [0, 0, -1],
-                    ],
-                    [
-                        [0, -1, 0],
-                        [0, 0, -1],
-                    ],
-                    // bottom layer
-                    [
-                        [-1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, 0, 1],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, 1, 0],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, 0, -1],
-                    ],
-                    [
-                        [-1, 0, 0],
-                        [0, -1, 0],
-                    ],
-                ];
-                Debug.Assert(defaultCubeCol.Length == defaultCubeVec.Length);
-                Debug.Assert(defaultCubeCol.Length == 20);
-                for (int i = 0; i < defaultCubeCol.Length; ++i)
+                var vi = defaultCubeVec[i][0];
+                var v1 = new Vec3(vi[0], vi[1], vi[2]);
+                vi = defaultCubeVec[i][1];
+                var v2 = new Vec3(vi[0], vi[1], vi[2]);
+                if (defaultCubeCol[i].Length == 2)
                 {
-                    var vi = defaultCubeVec[i][0];
-                    var v1 = new Vec3(vi[0], vi[1], vi[2]);
-                    vi = defaultCubeVec[i][1];
-                    var v2 = new Vec3(vi[0], vi[1], vi[2]);
-                    if (defaultCubeCol[i].Length == 2)
-                    {
-                        _blocks[i] = new Edge(defaultCubeCol[i], v1, v2);
-                    }
-                    else
-                    {
-                        _blocks[i] = new Corner(defaultCubeCol[i], v1, v2);
-                    }
+                    _blocks[i] = new Edge(defaultCubeCol[i], v1, v2);
+                }
+                else
+                {
+                    _blocks[i] = new Corner(defaultCubeCol[i], v1, v2);
                 }
             }
         }
@@ -593,6 +628,7 @@ namespace rubiks_cube_simulator
             Console.ResetColor();
         }
 
+        //TODO: move this to be a block method
         private Color getFaceCol(int index, Vec3 dir)
         {
             var a = _blocks[index];
@@ -739,9 +775,12 @@ namespace rubiks_cube_simulator
         static void Main(string[] args)
         {
             Cube cube = new Cube();
-            // cube.doAlgo("RUR'URUUR'");
-            cube.doAlgo("RRLLFFBBUUDD");
+            Cube cube2 = new Cube();
+            Cube cube3 = new Cube();
+            cube.doAlgo("RUR'URUUR'");
             cube.print();
+            Console.WriteLine(cube.compare(cube2));
+            Console.WriteLine(cube2.compare(cube3));
         }
     }
 }
