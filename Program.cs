@@ -25,6 +25,11 @@ namespace rubiks_cube_simulator
         public static bool operator !=(Vec3 left, Vec3 right) =>
             ((left.x != right.x) || (left.y != right.y) || (left.z != right.z));
 
+        public string dbgStr()
+        {
+            return $"({x}, {y}, {z})";
+        }
+
         public void rotateCounterClockwiseX()
         {
             (this.y, this.z) = (-this.z, this.y);
@@ -92,6 +97,27 @@ namespace rubiks_cube_simulator
             _secondaryVec = v2;
         }
 
+        public virtual string dbgStr()
+        {
+            return $"{_primaryVec.dbgStr()}, {_secondaryVec.dbgStr()}, {string.Join(", ", this.getColors())}";
+        }
+
+        public virtual Color getFaceColor(Vec3 dir)
+        {
+            if (this.primaryVec == dir)
+            {
+                return this.getColors()[0];
+            }
+            else if (this.secondaryVec == dir)
+            {
+                return this.getColors()[1];
+            }
+            else
+            {
+                throw new InvalidOperationException("Unable to get proper color for face");
+            }
+        }
+
         public virtual Color[] getColors()
         {
             return new Color[] { _firstCol, _secondCol };
@@ -153,9 +179,9 @@ namespace rubiks_cube_simulator
         public static bool operator !=(Edge left, Edge right) =>
             (
                 (left._firstCol != right._firstCol)
-                && (left._secondCol != right._secondCol)
-                && (left._primaryVec != right._primaryVec)
-                && (left._secondaryVec != right._secondaryVec)
+                || (left._secondCol != right._secondCol)
+                || (left._primaryVec != right._primaryVec)
+                || (left._secondaryVec != right._secondaryVec)
             );
 
         public Edge() { }
@@ -191,6 +217,22 @@ namespace rubiks_cube_simulator
 
         public Corner() { }
 
+        public override Color getFaceColor(Vec3 dir)
+        {
+            if (this.primaryVec == dir)
+            {
+                return this.getColors()[0];
+            }
+            else if (this.secondaryVec == dir)
+            {
+                return this.getColors()[1];
+            }
+            else
+            {
+                return this.getColors()[2];
+            }
+        }
+
         public override Color[] getColors()
         {
             return new Color[] { _firstCol, _secondCol, _thirdCol };
@@ -216,12 +258,16 @@ namespace rubiks_cube_simulator
             return _blocks[index];
         }
 
-        //TODO:
+        //TODO:Fix this bullshit
         public bool compare(Cube cube)
         {
             for (int i = 0; i < _blocks.Length; ++i)
             {
-                if (_blocks[i] != cube._blocks[i])
+                Console.WriteLine(_blocks[i].dbgStr());
+                Console.WriteLine(cube._blocks[i].dbgStr());
+                Boolean x = _blocks[i] != cube._blocks[i];
+                Console.WriteLine(x);
+                if (x)
                 {
                     return false;
                 }
@@ -628,48 +674,10 @@ namespace rubiks_cube_simulator
             Console.ResetColor();
         }
 
-        //TODO: move this to be a block method
-        private Color getFaceCol(int index, Vec3 dir)
+        private Color getFaceColor(int index, Vec3 dir)
         {
             var a = _blocks[index];
-            var cols = a.getColors();
-
-            if (cols.Length == 2)
-            {
-                if (a.primaryVec == dir)
-                {
-                    return cols[0];
-                }
-                else if (a.secondaryVec == dir)
-                {
-                    return cols[1];
-                }
-                else
-                {
-                    //TODO: throw an error
-                    return Color.White;
-                }
-            }
-            else if (cols.Length == 3)
-            {
-                if (a.primaryVec == dir)
-                {
-                    return cols[0];
-                }
-                else if (a.secondaryVec == dir)
-                {
-                    return cols[1];
-                }
-                else
-                {
-                    return cols[2];
-                }
-            }
-            else
-            {
-                //TODO: throw an error
-                return Color.White;
-            }
+            return a.getFaceColor(dir);
         }
 
         public void print()
@@ -678,94 +686,94 @@ namespace rubiks_cube_simulator
 
             // blue face
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(19, new Vec3(0, -1, 0)));
-            this.printColBlock(this.getFaceCol(12, new Vec3(0, -1, 0)));
-            this.printColBlock(this.getFaceCol(13, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(19, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(12, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(13, new Vec3(0, -1, 0)));
             Console.WriteLine("");
 
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(11, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(11, new Vec3(0, -1, 0)));
             this.printColBlock(Color.Blue);
-            this.printColBlock(this.getFaceCol(8, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(8, new Vec3(0, -1, 0)));
             Console.WriteLine("");
 
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(7, new Vec3(0, -1, 0)));
-            this.printColBlock(this.getFaceCol(0, new Vec3(0, -1, 0)));
-            this.printColBlock(this.getFaceCol(1, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(7, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(0, new Vec3(0, -1, 0)));
+            this.printColBlock(this.getFaceColor(1, new Vec3(0, -1, 0)));
             Console.WriteLine("");
 
             // orange face pt1
-            this.printColBlock(this.getFaceCol(19, new Vec3(0, 0, -1)));
-            this.printColBlock(this.getFaceCol(11, new Vec3(0, 0, -1)));
-            this.printColBlock(this.getFaceCol(7, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(19, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(11, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(7, new Vec3(0, 0, -1)));
             // white face pt1
-            this.printColBlock(this.getFaceCol(7, new Vec3(1, 0, 0)));
-            this.printColBlock(this.getFaceCol(0, new Vec3(1, 0, 0)));
-            this.printColBlock(this.getFaceCol(1, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(7, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(0, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(1, new Vec3(1, 0, 0)));
             // red face pt1
-            this.printColBlock(this.getFaceCol(1, new Vec3(0, 0, 1)));
-            this.printColBlock(this.getFaceCol(8, new Vec3(0, 0, 1)));
-            this.printColBlock(this.getFaceCol(13, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(1, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(8, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(13, new Vec3(0, 0, 1)));
             // yellow face pt1
-            this.printColBlock(this.getFaceCol(13, new Vec3(-1, 0, 0)));
-            this.printColBlock(this.getFaceCol(12, new Vec3(-1, 0, 0)));
-            this.printColBlock(this.getFaceCol(19, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(13, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(12, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(19, new Vec3(-1, 0, 0)));
             Console.WriteLine("");
 
             // orange face pt2
-            this.printColBlock(this.getFaceCol(18, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(18, new Vec3(0, 0, -1)));
             this.printColBlock(Color.Orange);
-            this.printColBlock(this.getFaceCol(6, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(6, new Vec3(0, 0, -1)));
             // white face pt2
-            this.printColBlock(this.getFaceCol(6, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(6, new Vec3(1, 0, 0)));
             this.printColBlock(Color.White);
-            this.printColBlock(this.getFaceCol(2, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(2, new Vec3(1, 0, 0)));
             // red face pt2
-            this.printColBlock(this.getFaceCol(2, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(2, new Vec3(0, 0, 1)));
             this.printColBlock(Color.Red);
-            this.printColBlock(this.getFaceCol(14, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(14, new Vec3(0, 0, 1)));
             // yellow face pt2
-            this.printColBlock(this.getFaceCol(14, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(14, new Vec3(-1, 0, 0)));
             this.printColBlock(Color.Yellow);
-            this.printColBlock(this.getFaceCol(18, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(18, new Vec3(-1, 0, 0)));
             Console.WriteLine("");
 
             // orange face pt3
-            this.printColBlock(this.getFaceCol(17, new Vec3(0, 0, -1)));
-            this.printColBlock(this.getFaceCol(10, new Vec3(0, 0, -1)));
-            this.printColBlock(this.getFaceCol(5, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(17, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(10, new Vec3(0, 0, -1)));
+            this.printColBlock(this.getFaceColor(5, new Vec3(0, 0, -1)));
             // white face pt3
-            this.printColBlock(this.getFaceCol(5, new Vec3(1, 0, 0)));
-            this.printColBlock(this.getFaceCol(4, new Vec3(1, 0, 0)));
-            this.printColBlock(this.getFaceCol(3, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(5, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(4, new Vec3(1, 0, 0)));
+            this.printColBlock(this.getFaceColor(3, new Vec3(1, 0, 0)));
             // red face pt3
-            this.printColBlock(this.getFaceCol(3, new Vec3(0, 0, 1)));
-            this.printColBlock(this.getFaceCol(9, new Vec3(0, 0, 1)));
-            this.printColBlock(this.getFaceCol(15, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(3, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(9, new Vec3(0, 0, 1)));
+            this.printColBlock(this.getFaceColor(15, new Vec3(0, 0, 1)));
             // yellow face pt3
-            this.printColBlock(this.getFaceCol(15, new Vec3(-1, 0, 0)));
-            this.printColBlock(this.getFaceCol(16, new Vec3(-1, 0, 0)));
-            this.printColBlock(this.getFaceCol(17, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(15, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(16, new Vec3(-1, 0, 0)));
+            this.printColBlock(this.getFaceColor(17, new Vec3(-1, 0, 0)));
             Console.WriteLine("");
 
             // blue face
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(5, new Vec3(0, 1, 0)));
-            this.printColBlock(this.getFaceCol(4, new Vec3(0, 1, 0)));
-            this.printColBlock(this.getFaceCol(3, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(5, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(4, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(3, new Vec3(0, 1, 0)));
             Console.WriteLine("");
 
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(10, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(10, new Vec3(0, 1, 0)));
             this.printColBlock(Color.Green);
-            this.printColBlock(this.getFaceCol(9, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(9, new Vec3(0, 1, 0)));
             Console.WriteLine("");
 
             Console.Write($"{_face}{_face}{_face}");
-            this.printColBlock(this.getFaceCol(17, new Vec3(0, 1, 0)));
-            this.printColBlock(this.getFaceCol(16, new Vec3(0, 1, 0)));
-            this.printColBlock(this.getFaceCol(15, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(17, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(16, new Vec3(0, 1, 0)));
+            this.printColBlock(this.getFaceColor(15, new Vec3(0, 1, 0)));
             Console.WriteLine("");
         }
     }
@@ -776,11 +784,9 @@ namespace rubiks_cube_simulator
         {
             Cube cube = new Cube();
             Cube cube2 = new Cube();
-            Cube cube3 = new Cube();
+            Console.WriteLine(cube.compare(cube2));
             cube.doAlgo("RUR'URUUR'");
             cube.print();
-            Console.WriteLine(cube.compare(cube2));
-            Console.WriteLine(cube2.compare(cube3));
         }
     }
 }
