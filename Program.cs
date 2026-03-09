@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace rubiks_cube_simulator
@@ -24,6 +23,21 @@ namespace rubiks_cube_simulator
 
         public static bool operator !=(Vec3 left, Vec3 right) =>
             ((left.x != right.x) || (left.y != right.y) || (left.z != right.z));
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Vec3 other)
+            {
+                return ((this.x == other.x) && (this.y == other.y) && (this.z == other.z));
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() + y.GetHashCode() + z.GetHashCode();
+        }
 
         public string dbgStr()
         {
@@ -77,6 +91,17 @@ namespace rubiks_cube_simulator
         protected Color _secondCol = Color.White;
         protected Vec3 _primaryVec = new Vec3(0, 0, 0);
         protected Vec3 _secondaryVec = new Vec3(0, 0, 0);
+
+        public bool compare(Block right)
+        {
+            Boolean cols =
+                (this._firstCol == right._firstCol) && (this._secondCol == right._secondCol);
+            Boolean vecs =
+                (this._primaryVec == right._primaryVec)
+                && (this._secondaryVec == right._secondaryVec);
+            // Console.WriteLine($"cols: {cols}, vecs:{vecs}");
+            return cols && vecs;
+        }
 
         public Vec3 primaryVec
         {
@@ -168,22 +193,6 @@ namespace rubiks_cube_simulator
 
     class Edge : Block
     {
-        public static bool operator ==(Edge left, Edge right) =>
-            (
-                (left._firstCol == right._firstCol)
-                && (left._secondCol == right._secondCol)
-                && (left._primaryVec == right._primaryVec)
-                && (left._secondaryVec == right._secondaryVec)
-            );
-
-        public static bool operator !=(Edge left, Edge right) =>
-            (
-                (left._firstCol != right._firstCol)
-                || (left._secondCol != right._secondCol)
-                || (left._primaryVec != right._primaryVec)
-                || (left._secondaryVec != right._secondaryVec)
-            );
-
         public Edge() { }
 
         public Edge(Color[] colors, Vec3 v1, Vec3 v2)
@@ -199,21 +208,18 @@ namespace rubiks_cube_simulator
     {
         private Color _thirdCol = Color.White;
 
-        public static bool operator ==(Corner left, Corner right) =>
-            (
-                (left._firstCol == right._firstCol)
-                && (left._secondCol == right._secondCol)
-                && (left._primaryVec == right._primaryVec)
-                && (left._secondaryVec == right._secondaryVec)
-            );
-
-        public static bool operator !=(Corner left, Corner right) =>
-            (
-                (left._firstCol != right._firstCol)
-                && (left._secondCol != right._secondCol)
-                && (left._primaryVec != right._primaryVec)
-                && (left._secondaryVec != right._secondaryVec)
-            );
+        public bool compare(Corner right)
+        {
+            Boolean cols =
+                (this._firstCol == right._firstCol)
+                && (this._secondCol == right._secondCol)
+                && (this._thirdCol == right._thirdCol);
+            Boolean vecs =
+                (this._primaryVec == right._primaryVec)
+                && (this._secondaryVec == right._secondaryVec);
+            // Console.WriteLine($"cols: {cols}, vecs:{vecs}");
+            return cols && vecs;
+        }
 
         public Corner() { }
 
@@ -263,11 +269,11 @@ namespace rubiks_cube_simulator
         {
             for (int i = 0; i < _blocks.Length; ++i)
             {
-                Console.WriteLine(_blocks[i].dbgStr());
-                Console.WriteLine(cube._blocks[i].dbgStr());
-                Boolean x = _blocks[i] != cube._blocks[i];
-                Console.WriteLine(x);
-                if (x)
+                // Console.WriteLine(_blocks[i].dbgStr());
+                // Console.WriteLine(cube._blocks[i].dbgStr());
+                Boolean x = _blocks[i].compare(cube._blocks[i]);
+                // Console.WriteLine(x);
+                if (!x)
                 {
                     return false;
                 }
