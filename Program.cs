@@ -1,13 +1,32 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace rubiks_cube_simulator
 {
     class Vec3
     {
-        public float x,
-            y,
-            z;
+        public float _x,
+            _y,
+            _z;
+
+        public float x
+        {
+            set { _x = value; }
+            get { return _x; }
+        }
+        public float y
+        {
+            set { _y = value; }
+            get { return _y; }
+        }
+        public float z
+        {
+            set { _z = value; }
+            get { return _z; }
+        }
 
         public Vec3() { }
 
@@ -85,12 +104,36 @@ namespace rubiks_cube_simulator
         Orange,
     }
 
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(Corner), "Corner")]
+    [JsonDerivedType(typeof(Edge), "Edge")]
     class Block
     {
         protected Color _firstCol = Color.White;
         protected Color _secondCol = Color.White;
         protected Vec3 _primaryVec = new Vec3(0, 0, 0);
         protected Vec3 _secondaryVec = new Vec3(0, 0, 0);
+
+        public Color firstCol
+        {
+            set { _firstCol = value; }
+            get { return _firstCol; }
+        }
+        public Color secondCol
+        {
+            set { _secondCol = value; }
+            get { return _secondCol; }
+        }
+        public Vec3 primaryVec
+        {
+            set { _primaryVec = value; }
+            get { return _primaryVec; }
+        }
+        public Vec3 secondaryVec
+        {
+            set { _secondaryVec = value; }
+            get { return _secondaryVec; }
+        }
 
         public bool compare(Block right)
         {
@@ -101,15 +144,6 @@ namespace rubiks_cube_simulator
                 && (this._secondaryVec == right._secondaryVec);
             // Console.WriteLine($"cols: {cols}, vecs:{vecs}");
             return cols && vecs;
-        }
-
-        public Vec3 primaryVec
-        {
-            get { return _primaryVec; }
-        }
-        public Vec3 secondaryVec
-        {
-            get { return _secondaryVec; }
         }
 
         public Block() { }
@@ -139,7 +173,7 @@ namespace rubiks_cube_simulator
             }
             else
             {
-                throw new InvalidOperationException("Unable to get proper color for face");
+                throw new InvalidOperationException($"Unable to get proper color for face");
             }
         }
 
@@ -208,6 +242,12 @@ namespace rubiks_cube_simulator
     {
         private Color _thirdCol = Color.White;
 
+        public Color thirdCol
+        {
+            set { _thirdCol = value; }
+            get { return _thirdCol; }
+        }
+
         public bool compare(Corner right)
         {
             Boolean cols =
@@ -225,11 +265,11 @@ namespace rubiks_cube_simulator
 
         public override Color getFaceColor(Vec3 dir)
         {
-            if (this.primaryVec == dir)
+            if (this._primaryVec == dir)
             {
                 return this.getColors()[0];
             }
-            else if (this.secondaryVec == dir)
+            else if (this._secondaryVec == dir)
             {
                 return this.getColors()[1];
             }
@@ -259,12 +299,17 @@ namespace rubiks_cube_simulator
         private Block[] _blocks = new Block[20];
         private string _face = "  ";
 
+        public Block[] blocks
+        {
+            set { _blocks = value; }
+            get { return _blocks; }
+        }
+
         public Block getBlock(int index)
         {
             return _blocks[index];
         }
 
-        //TODO:Fix this bullshit
         public bool compare(Cube cube)
         {
             for (int i = 0; i < _blocks.Length; ++i)
@@ -336,7 +381,14 @@ namespace rubiks_cube_simulator
             return -1;
         }
 
-        public Cube()
+        public Cube(Block[] b)
+        {
+            blocks = b;
+        }
+
+        public Cube() { }
+
+        public Cube(Boolean createNew = true)
         {
             Color[][] defaultCubeCol =
             [
@@ -788,11 +840,50 @@ namespace rubiks_cube_simulator
     {
         static void Main(string[] args)
         {
-            Cube cube = new Cube();
-            Cube cube2 = new Cube();
+            Cube cube = new Cube(true);
+            Cube cube2 = new Cube(true);
+            Cube? cube3 = new Cube();
             Console.WriteLine(cube.compare(cube2));
-            cube.doAlgo("RUR'URUUR'");
+            // cube.doAlgo("RUR'URUUR'");
             cube.print();
+            string h = JsonSerializer.Serialize(cube);
+            Console.WriteLine(h);
+            using (StreamWriter f = new StreamWriter("./tmp/test.json"))
+            {
+                f.Write(h);
+            }
+
+            foreach (var item in cube.blocks)
+            {
+                Console.WriteLine(item?.GetType());
+            }
+
+            cube3 = JsonSerializer.Deserialize<Cube>(h);
+            h = JsonSerializer.Serialize(cube3);
+            Console.WriteLine(h);
+            using (StreamWriter f = new StreamWriter("./tmp/test2.json"))
+            {
+                f.Write(h);
+            }
+            if (cube3 != null)
+            {
+                foreach (var item in cube3.blocks)
+                {
+                    Console.WriteLine(item?.GetType());
+                }
+                cube3.print();
+            }
+
+            // Cube? cube;
+            // using (StreamReader r = new StreamReader("./tmp/test.json"))
+            // {
+            //     string h = r.ReadToEnd();
+            //     cube = JsonSerializer.Deserialize<Cube>(h);
+            // }
+            // if (cube != null)
+            // {
+            //     cube.print();
+            // }
         }
     }
 }
