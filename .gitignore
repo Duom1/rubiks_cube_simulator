@@ -5,6 +5,7 @@
 
 # Custom
 tmp/
+*.json
 
 # User-specific files
 *.rsuser

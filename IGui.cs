@@ -2,8 +2,8 @@ namespace rubiks_cube_simulator
 {
     interface IGui
     {
-        void createWindow();
-        void drawCube();
-        void drawMove();
+        public void createWindow();
+        public void addCube(Cube cube);
+        public void mainLoop();
     }
 }
