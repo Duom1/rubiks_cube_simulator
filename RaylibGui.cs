@@ -9,6 +9,7 @@ namespace rubiks_cube_simulator;
 class RaylibGui
 {
     private Cube _cube = new Cube(true);
+    private string[] _algos = new List<string>();
 
     public Cube cube
     {
@@ -28,11 +29,34 @@ class RaylibGui
 
     public RaylibGui() { }
 
+    public void queueAlgo(string algo)
+    {
+        _algos.Append(algo);
+    }
+
     public void createWindow()
     {
         Raylib.InitWindow(1200, 800, "Rubiks Cube");
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
         Raylib.SetTargetFPS(144);
+    }
+
+    public static Vector3 translateCubeToRay(Vec3 pos)
+    {
+        var translate = (Vec3)pos.Clone();
+        translate.rotateClockwiseY();
+        translate.rotateCounterClockwiseZ();
+        translate.rotateCounterClockwiseZ();
+        return new(translate.x, translate.y, translate.z);
+    }
+
+    public static Vector3 translateBackCubeToRay(Vec3 pos)
+    {
+        var translate = (Vec3)pos.Clone();
+        translate.rotateCounterClockwiseY();
+        translate.rotateClockwiseZ();
+        translate.rotateClockwiseZ();
+        return new(translate.x, translate.y, translate.z);
     }
 
     public static RayColor CubeColToRay(CubeColor col)
@@ -83,14 +107,14 @@ class RaylibGui
             new(-1f, 0f, -1f),
             new(-1f, 1f, -1f),
         };
-        Vector3[] centerPos =
+        (Vector3, RayColor)[] centerPos =
         {
-            new(0f, 0f, 1f),
-            new(0f, 0f, -1f),
-            new(1f, 0f, 0f),
-            new(0f, 1f, 0f),
-            new(0f, -1f, 0f),
-            new(-1f, 0f, 0f),
+            (new(0f, 0f, 1f), RayColor.White),
+            (new(0f, 0f, -1f), RayColor.Yellow),
+            (new(1f, 0f, 0f), RayColor.Red),
+            (new(0f, 1f, 0f), RayColor.Blue),
+            (new(0f, -1f, 0f), RayColor.Green),
+            (new(-1f, 0f, 0f), RayColor.Orange),
         };
         Camera3D camera = new Camera3D();
         camera.Position = new Vector3(5f, 5f, 5f);
@@ -101,7 +125,10 @@ class RaylibGui
 
         var hblockSize = new Vector3(0.8f, 0.8f, 0.8f);
         var fblockSize = new Vector3(1f, 1f, 1f);
-        float plateMove = 0.2f;
+        float plateMove = 0.15f;
+
+        Boolean drawWires = false;
+        Boolean drawGrid = true;
 
         while (!Raylib.WindowShouldClose())
         {
@@ -109,8 +136,16 @@ class RaylibGui
             int blocksLen = blocks.Length;
 
             if (Raylib.IsMouseButtonDown(MouseButton.Left))
-            {
                 Raylib.UpdateCamera(ref camera, CameraMode.ThirdPerson);
+            if (Raylib.IsKeyPressed(KeyboardKey.H))
+                drawWires = !drawWires;
+            if (Raylib.IsKeyPressed(KeyboardKey.G))
+                drawGrid = !drawGrid;
+
+            if (_algos.Length != 0)
+            {
+                string alg = _algos.RemoveAt(_algos.Count - 1);
+                cube.doAlgo(alg);
             }
 
             Raylib.BeginDrawing();
@@ -122,23 +157,17 @@ class RaylibGui
                     for (int i = 0; i < blocksLen; ++i)
                     {
                         Block block = cube.blocks[i];
-                        var translate = (Vec3)block.primaryVec.Clone();
-                        translate.rotateClockwiseX();
-                        translate.rotateClockwiseY();
-                        var translate2 = (Vec3)block.secondaryVec.Clone();
-                        translate2.rotateClockwiseX();
-                        translate2.rotateClockwiseY();
-                        Vector3 colFacePos = new(
-                            translate.x * plateMove + blockPos[i].X,
-                            translate.y * plateMove + blockPos[i].Y,
-                            translate.z * plateMove + blockPos[i].Z
-                        );
-                        Vector3 colFacePos2 = new(
-                            translate2.x * plateMove + blockPos[i].X,
-                            translate2.y * plateMove + blockPos[i].Y,
-                            translate2.z * plateMove + blockPos[i].Z
-                        );
-                        Raylib.DrawCubeV(blockPos[i], fblockSize, RayColor.Black);
+
+                        Vector3 colFacePos =
+                            translateCubeToRay(block.primaryVec) * plateMove + blockPos[i];
+                        Vector3 colFacePos2 =
+                            translateCubeToRay(block.secondaryVec) * plateMove + blockPos[i];
+
+                        if (!drawWires)
+                            Raylib.DrawCubeV(blockPos[i], fblockSize, RayColor.Black);
+                        else
+                            Raylib.DrawCubeWiresV(blockPos[i], fblockSize, RayColor.Black);
+
                         Raylib.DrawCubeV(
                             colFacePos2,
                             hblockSize,
@@ -149,26 +178,34 @@ class RaylibGui
                             hblockSize,
                             CubeColToRay(block.getFaceColor(block.primaryVec))
                         );
-                        // RayColor color = RayColor.Maroon;
-                        // if (i.Z == 0)
-                        // {
-                        //     color = RayColor.Blue;
-                        // }
-                        // else if (i.Z == -1)
-                        // {
-                        //     color = RayColor.Green;
-                        // }
-                        // Raylib.DrawCube(i, blockSize, blockSize, blockSize, color);
-                        // Raylib.DrawCubeWires(i, blockSize, blockSize, blockSize, RayColor.Black);
+
+                        if (cube.blocks[i].GetType() == typeof(Corner))
+                        {
+                            var third = new Vec3(blockPos[i].X, 0, 0);
+                            var translate3 = (Vec3)third.Clone();
+                            third.rotateCounterClockwiseY();
+                            third.rotateClockwiseZ();
+                            third.rotateClockwiseZ();
+                            Vector3 colFacePos3 = new(
+                                translate3.x * plateMove + blockPos[i].X,
+                                translate3.y * plateMove + blockPos[i].Y,
+                                translate3.z * plateMove + blockPos[i].Z
+                            );
+                            Raylib.DrawCubeV(
+                                colFacePos3,
+                                hblockSize,
+                                CubeColToRay(block.getFaceColor(third))
+                            );
+                        }
                     }
                     foreach (var i in centerPos)
                     {
-                        Raylib.DrawCubeV(i, fblockSize, RayColor.Black);
+                        if (!drawWires)
+                            Raylib.DrawCubeV(i.Item1, fblockSize, RayColor.Black);
+                        Raylib.DrawCubeV(i.Item1 + (i.Item1 * plateMove), hblockSize, i.Item2);
                     }
-                    // Raylib.DrawCubeV(new Vector3(1.5f, 0, 0), hblockSize, RayColor.Purple);
-                    // Raylib.DrawCubeV(new Vector3(0f, 1.5f, 0), hblockSize, RayColor.Yellow);
-
-                    Raylib.DrawGrid(2, 5f);
+                    if (drawGrid)
+                        Raylib.DrawGrid(2, 5f);
                 }
                 Raylib.EndMode3D();
                 Raylib.DrawFPS(10, 10);
