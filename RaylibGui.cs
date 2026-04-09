@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Raylib_cs;
 using CubeColor = rubiks_cube_simulator.Color;
@@ -9,7 +10,8 @@ namespace rubiks_cube_simulator;
 class RaylibGui
 {
     private Cube _cube = new Cube(true);
-    private string[] _algos = new List<string>();
+
+    private List<string> _algos = new List<string>();
 
     public Cube cube
     {
@@ -31,7 +33,7 @@ class RaylibGui
 
     public void queueAlgo(string algo)
     {
-        _algos.Append(algo);
+        _algos.Add(algo);
     }
 
     public void createWindow()
@@ -130,8 +132,15 @@ class RaylibGui
         Boolean drawWires = false;
         Boolean drawGrid = true;
 
+        int loopCount = 0;
+
         while (!Raylib.WindowShouldClose())
         {
+            ++loopCount;
+
+            if (loopCount == 144 * 1)
+                this.queueAlgo("RB'");
+
             Block[] blocks = cube.blocks;
             int blocksLen = blocks.Length;
 
@@ -142,9 +151,11 @@ class RaylibGui
             if (Raylib.IsKeyPressed(KeyboardKey.G))
                 drawGrid = !drawGrid;
 
-            if (_algos.Length != 0)
+            if (_algos.Count != 0)
             {
-                string alg = _algos.RemoveAt(_algos.Count - 1);
+                int removeAlgoIndex = _algos.Count - 1;
+                string alg = _algos[removeAlgoIndex];
+                _algos.RemoveAt(removeAlgoIndex);
                 cube.doAlgo(alg);
             }
 
@@ -179,6 +190,7 @@ class RaylibGui
                             CubeColToRay(block.getFaceColor(block.primaryVec))
                         );
 
+                        // TODO: something needs to be done for the third vector
                         if (cube.blocks[i].GetType() == typeof(Corner))
                         {
                             var third = new Vec3(blockPos[i].X, 0, 0);
