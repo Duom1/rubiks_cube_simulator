@@ -139,7 +139,7 @@ class RaylibGui
             ++loopCount;
 
             if (loopCount == 144 * 1)
-                this.queueAlgo("RB'");
+                this.queueAlgo("b'");
 
             Block[] blocks = cube.blocks;
             int blocksLen = blocks.Length;
@@ -190,24 +190,31 @@ class RaylibGui
                             CubeColToRay(block.getFaceColor(block.primaryVec))
                         );
 
-                        // TODO: something needs to be done for the third vector
                         if (cube.blocks[i].GetType() == typeof(Corner))
                         {
-                            var third = new Vec3(blockPos[i].X, 0, 0);
-                            var translate3 = (Vec3)third.Clone();
-                            third.rotateCounterClockwiseY();
-                            third.rotateClockwiseZ();
-                            third.rotateClockwiseZ();
-                            Vector3 colFacePos3 = new(
-                                translate3.x * plateMove + blockPos[i].X,
-                                translate3.y * plateMove + blockPos[i].Y,
-                                translate3.z * plateMove + blockPos[i].Z
-                            );
+                            Vector3 colFacePos3 =
+                                translateCubeToRay(((Corner)block).thirdVec) * plateMove
+                                + blockPos[i];
                             Raylib.DrawCubeV(
                                 colFacePos3,
                                 hblockSize,
-                                CubeColToRay(block.getFaceColor(third))
+                                CubeColToRay(block.getFaceColor(((Corner)block).thirdVec))
                             );
+                            // var third = new Vec3(blockPos[i].X, 0, 0);
+                            // var translate3 = (Vec3)third.Clone();
+                            // third.rotateCounterClockwiseY();
+                            // third.rotateClockwiseZ();
+                            // third.rotateClockwiseZ();
+                            // Vector3 colFacePos3 = new(
+                            //     translate3.x * plateMove + blockPos[i].X,
+                            //     translate3.y * plateMove + blockPos[i].Y,
+                            //     translate3.z * plateMove + blockPos[i].Z
+                            // );
+                            // Raylib.DrawCubeV(
+                            //     colFacePos3,
+                            //     hblockSize,
+                            //     CubeColToRay(block.getFaceColor(third))
+                            // );
                         }
                     }
                     foreach (var i in centerPos)
