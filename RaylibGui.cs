@@ -146,6 +146,12 @@ class RaylibGui
         Vector2 boxStart = new(10, 10);
         Vector2 boxSize = new(0, 0);
 
+        // if (
+        //     Raylib.IsKeyDown(KeyboardKey.LeftControl)
+        //     // || Raylib.IsKeyDown(KeyboardKey.RightControl)
+        //     && Raylib.IsKeyPressed(KeyboardKey.S)
+        // ) { }
+
         int loopCount = 0;
 
         while (!Raylib.WindowShouldClose())
@@ -223,8 +229,11 @@ class RaylibGui
                 }
                 if (Raylib.IsKeyPressed(KeyboardKey.Enter))
                 {
-                    queueAlgo(boxAlgo);
-                    boxAlgo = "";
+                    if (boxAlgo.Length != 0)
+                    {
+                        queueAlgo(boxAlgo);
+                        boxAlgo = "";
+                    }
                 }
                 if (Raylib.IsKeyPressed(KeyboardKey.Backspace))
                 {
