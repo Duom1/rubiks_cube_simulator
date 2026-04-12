@@ -33,6 +33,15 @@ class RaylibGui
 
     public void queueAlgo(string algo)
     {
+        algo = algo.ToUpper();
+        algo = algo.Replace("U", "Q");
+        algo = algo.Replace("F", "W");
+        algo = algo.Replace("B", "E");
+        algo = algo.Replace("D", "A");
+        algo = algo.Replace("Q", "B");
+        algo = algo.Replace("W", "U");
+        algo = algo.Replace("E", "D");
+        algo = algo.Replace("A", "F");
         _algos.Add(algo);
     }
 
@@ -43,7 +52,7 @@ class RaylibGui
         // Raylib.SetTargetFPS(144);
     }
 
-    public static Vector3 translateCubeToRay(Vec3 pos)
+    private static Vector3 translateCubeToRay(Vec3 pos)
     {
         var translate = (Vec3)pos.Clone();
         translate.rotateClockwiseY();
@@ -52,7 +61,7 @@ class RaylibGui
         return new(translate.x, translate.y, translate.z);
     }
 
-    public static Vector3 translateBackCubeToRay(Vec3 pos)
+    private static Vector3 translateBackCubeToRay(Vec3 pos)
     {
         var translate = (Vec3)pos.Clone();
         translate.rotateCounterClockwiseY();
@@ -61,18 +70,18 @@ class RaylibGui
         return new(translate.x, translate.y, translate.z);
     }
 
-    public static RayColor CubeColToRay(CubeColor col)
+    private static RayColor CubeColToRay(CubeColor col)
     {
         switch (col)
         {
             case CubeColor.White:
-                return RayColor.White;
-            case CubeColor.Yellow:
-                return RayColor.Yellow;
-            case CubeColor.Green:
                 return RayColor.Green;
-            case CubeColor.Blue:
+            case CubeColor.Yellow:
                 return RayColor.Blue;
+            case CubeColor.Green:
+                return RayColor.Yellow;
+            case CubeColor.Blue:
+                return RayColor.White;
             case CubeColor.Orange:
                 return RayColor.Orange;
             case CubeColor.Red:
@@ -111,11 +120,11 @@ class RaylibGui
         };
         (Vector3, RayColor)[] centerPos =
         {
-            (new(0f, 0f, 1f), RayColor.White),
-            (new(0f, 0f, -1f), RayColor.Yellow),
+            (new(0f, 0f, 1f), RayColor.Green),
+            (new(0f, 0f, -1f), RayColor.Blue),
             (new(1f, 0f, 0f), RayColor.Red),
-            (new(0f, 1f, 0f), RayColor.Blue),
-            (new(0f, -1f, 0f), RayColor.Green),
+            (new(0f, 1f, 0f), RayColor.White),
+            (new(0f, -1f, 0f), RayColor.Yellow),
             (new(-1f, 0f, 0f), RayColor.Orange),
         };
         Camera3D camera = new Camera3D();
@@ -231,8 +240,11 @@ class RaylibGui
                     unsafe
                     {
                         var x = Raylib.GetClipboardText();
-                        string y = new(x);
-                        boxAlgo += y;
+                        if (x != null)
+                        {
+                            string y = new(x);
+                            boxAlgo += y;
+                        }
                     }
                 }
             }
