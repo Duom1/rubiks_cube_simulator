@@ -40,7 +40,7 @@ class RaylibGui
     {
         Raylib.InitWindow(1200, 800, "Rubiks Cube");
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
-        Raylib.SetTargetFPS(144);
+        // Raylib.SetTargetFPS(144);
     }
 
     public static Vector3 translateCubeToRay(Vec3 pos)
@@ -130,7 +130,12 @@ class RaylibGui
         float plateMove = 0.15f;
 
         Boolean drawWires = false;
-        Boolean drawGrid = true;
+        Boolean drawGrid = false;
+
+        Boolean selectedTextBox = false;
+        string boxAlgo = "";
+        Vector2 boxStart = new(10, 10);
+        Vector2 boxSize = new(0, 0);
 
         int loopCount = 0;
 
@@ -138,18 +143,99 @@ class RaylibGui
         {
             ++loopCount;
 
-            if (loopCount == 144 * 1)
-                this.queueAlgo("b'");
+            // if (loopCount == 144 * 1)
+            //     this.queueAlgo("RB'");
+            // if (loopCount == 144 * 2)
+            //     this.queueAlgo("LL");
+
+            if (Raylib.IsWindowResized() || loopCount == 1)
+            {
+                boxSize.X = Raylib.GetScreenWidth() - 20;
+                boxSize.Y = (int)(Raylib.GetScreenHeight() * .1);
+            }
 
             Block[] blocks = cube.blocks;
             int blocksLen = blocks.Length;
 
-            if (Raylib.IsMouseButtonDown(MouseButton.Left))
+            if (
+                Raylib.IsMouseButtonDown(MouseButton.Left)
+                && Raylib.GetMouseX() < boxStart.X + boxSize.X
+                && Raylib.GetMouseX() > boxStart.X
+                && Raylib.GetMouseY() < boxStart.Y + boxSize.Y
+                && Raylib.GetMouseY() > boxStart.Y
+            )
+            {
+                selectedTextBox = true;
+            }
+            else if (Raylib.IsMouseButtonDown(MouseButton.Left))
+            {
                 Raylib.UpdateCamera(ref camera, CameraMode.ThirdPerson);
+                selectedTextBox = false;
+            }
+
             if (Raylib.IsKeyPressed(KeyboardKey.H))
+            {
                 drawWires = !drawWires;
+            }
             if (Raylib.IsKeyPressed(KeyboardKey.G))
+            {
                 drawGrid = !drawGrid;
+            }
+
+            if (selectedTextBox)
+            {
+                if (Raylib.IsKeyPressed(KeyboardKey.F))
+                {
+                    boxAlgo += 'F';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.B))
+                {
+                    boxAlgo += 'B';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.R))
+                {
+                    boxAlgo += 'R';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.L))
+                {
+                    boxAlgo += 'L';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.U))
+                {
+                    boxAlgo += 'U';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.D))
+                {
+                    boxAlgo += 'D';
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.Apostrophe))
+                {
+                    boxAlgo += "'";
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.Enter))
+                {
+                    queueAlgo(boxAlgo);
+                    boxAlgo = "";
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.Backspace))
+                {
+                    if (boxAlgo.Length != 0)
+                        boxAlgo = boxAlgo.Remove(boxAlgo.Length - 1);
+                }
+                if (
+                    Raylib.IsKeyDown(KeyboardKey.LeftControl)
+                    // || Raylib.IsKeyDown(KeyboardKey.RightControl)
+                    && Raylib.IsKeyPressed(KeyboardKey.V)
+                )
+                {
+                    unsafe
+                    {
+                        var x = Raylib.GetClipboardText();
+                        string y = new(x);
+                        boxAlgo += y;
+                    }
+                }
+            }
 
             if (_algos.Count != 0)
             {
@@ -169,25 +255,25 @@ class RaylibGui
                     {
                         Block block = cube.blocks[i];
 
-                        Vector3 colFacePos =
-                            translateCubeToRay(block.primaryVec) * plateMove + blockPos[i];
-                        Vector3 colFacePos2 =
-                            translateCubeToRay(block.secondaryVec) * plateMove + blockPos[i];
-
                         if (!drawWires)
                             Raylib.DrawCubeV(blockPos[i], fblockSize, RayColor.Black);
                         else
                             Raylib.DrawCubeWiresV(blockPos[i], fblockSize, RayColor.Black);
 
-                        Raylib.DrawCubeV(
-                            colFacePos2,
-                            hblockSize,
-                            CubeColToRay(block.getFaceColor(block.secondaryVec))
-                        );
+                        Vector3 colFacePos =
+                            translateCubeToRay(block.primaryVec) * plateMove + blockPos[i];
                         Raylib.DrawCubeV(
                             colFacePos,
                             hblockSize,
                             CubeColToRay(block.getFaceColor(block.primaryVec))
+                        );
+
+                        Vector3 colFacePos2 =
+                            translateCubeToRay(block.secondaryVec) * plateMove + blockPos[i];
+                        Raylib.DrawCubeV(
+                            colFacePos2,
+                            hblockSize,
+                            CubeColToRay(block.getFaceColor(block.secondaryVec))
                         );
 
                         if (cube.blocks[i].GetType() == typeof(Corner))
@@ -200,23 +286,9 @@ class RaylibGui
                                 hblockSize,
                                 CubeColToRay(block.getFaceColor(((Corner)block).thirdVec))
                             );
-                            // var third = new Vec3(blockPos[i].X, 0, 0);
-                            // var translate3 = (Vec3)third.Clone();
-                            // third.rotateCounterClockwiseY();
-                            // third.rotateClockwiseZ();
-                            // third.rotateClockwiseZ();
-                            // Vector3 colFacePos3 = new(
-                            //     translate3.x * plateMove + blockPos[i].X,
-                            //     translate3.y * plateMove + blockPos[i].Y,
-                            //     translate3.z * plateMove + blockPos[i].Z
-                            // );
-                            // Raylib.DrawCubeV(
-                            //     colFacePos3,
-                            //     hblockSize,
-                            //     CubeColToRay(block.getFaceColor(third))
-                            // );
                         }
                     }
+
                     foreach (var i in centerPos)
                     {
                         if (!drawWires)
@@ -224,10 +296,21 @@ class RaylibGui
                         Raylib.DrawCubeV(i.Item1 + (i.Item1 * plateMove), hblockSize, i.Item2);
                     }
                     if (drawGrid)
+                    {
                         Raylib.DrawGrid(2, 5f);
+                    }
                 }
+
                 Raylib.EndMode3D();
-                Raylib.DrawFPS(10, 10);
+                Raylib.DrawFPS(10, (int)(boxStart.Y + boxSize.Y + 10));
+                Raylib.DrawRectangleV(boxStart, boxSize, RayColor.LightGray);
+                Raylib.DrawText(
+                    boxAlgo,
+                    (int)(boxSize.Y * .1 + boxStart.Y),
+                    10,
+                    (int)(boxSize.Y),
+                    RayColor.Green
+                );
             }
             Raylib.EndDrawing();
         }

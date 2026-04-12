@@ -242,7 +242,7 @@ class Cube
             [
                 [-1, 0, 0],
                 [0, -1, 0],
-                [0, 0, 1],
+                [0, 0, -1],
             ],
         ];
         Debug.Assert(defaultCubeCol.Length == defaultCubeVec.Length);
