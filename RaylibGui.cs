@@ -144,13 +144,15 @@ class RaylibGui
         Boolean selectedTextBox = false;
         string boxAlgo = "";
         Vector2 boxStart = new(10, 10);
-        Vector2 boxSize = new(0, 0);
+        Vector2 boxSize = new(50, 100);
 
-        // if (
-        //     Raylib.IsKeyDown(KeyboardKey.LeftControl)
-        //     // || Raylib.IsKeyDown(KeyboardKey.RightControl)
-        //     && Raylib.IsKeyPressed(KeyboardKey.S)
-        // ) { }
+        string saveBtn = "Save to\nsave.json";
+        Vector2 saveBtnStart = new(boxStart.X, boxStart.Y + boxSize.Y);
+        Vector2 saveBtnSize = new(110, 50);
+
+        string loadBtn = "Load from\nload.json";
+        Vector2 loadBtnStart = new(saveBtnStart.X + saveBtnSize.X + 10, boxStart.Y + boxSize.Y);
+        Vector2 loadBtnSize = new(120, 50);
 
         int loopCount = 0;
 
@@ -167,6 +169,10 @@ class RaylibGui
             {
                 boxSize.X = Raylib.GetScreenWidth() - 20;
                 boxSize.Y = (int)(Raylib.GetScreenHeight() * .1);
+                saveBtnStart.X = boxStart.X;
+                saveBtnStart.Y = boxStart.Y + boxSize.Y + 10;
+                loadBtnStart.X = saveBtnStart.X + saveBtnSize.X + 10;
+                loadBtnStart.Y = saveBtnStart.Y;
             }
 
             Block[] blocks = cube.blocks;
@@ -186,6 +192,27 @@ class RaylibGui
             {
                 Raylib.UpdateCamera(ref camera, CameraMode.ThirdPerson);
                 selectedTextBox = false;
+            }
+
+            if (
+                Raylib.IsMouseButtonPressed(MouseButton.Left)
+                && Raylib.GetMouseX() < saveBtnStart.X + saveBtnSize.X
+                && Raylib.GetMouseX() > saveBtnStart.X
+                && Raylib.GetMouseY() < saveBtnStart.Y + saveBtnSize.Y
+                && Raylib.GetMouseY() > saveBtnStart.Y
+            )
+            {
+                cube.serialize("save.json");
+            }
+            else if (
+                Raylib.IsMouseButtonPressed(MouseButton.Left)
+                && Raylib.GetMouseX() < loadBtnStart.X + loadBtnSize.X
+                && Raylib.GetMouseX() > loadBtnStart.X
+                && Raylib.GetMouseY() < loadBtnStart.Y + loadBtnSize.Y
+                && Raylib.GetMouseY() > loadBtnStart.Y
+            )
+            {
+                cube = new Cube("load.json");
             }
 
             if (Raylib.IsKeyPressed(KeyboardKey.H))
@@ -223,7 +250,10 @@ class RaylibGui
                 {
                     boxAlgo += 'D';
                 }
-                if (Raylib.IsKeyPressed(KeyboardKey.Apostrophe))
+                if (
+                    Raylib.IsKeyPressed(KeyboardKey.Apostrophe)
+                    || Raylib.IsKeyPressed(KeyboardKey.P)
+                )
                 {
                     boxAlgo += "'";
                 }
@@ -323,15 +353,31 @@ class RaylibGui
                 }
 
                 Raylib.EndMode3D();
-                Raylib.DrawFPS(10, (int)(boxStart.Y + boxSize.Y + 10));
                 Raylib.DrawRectangleV(boxStart, boxSize, RayColor.LightGray);
+                Raylib.DrawRectangleV(saveBtnStart, saveBtnSize, RayColor.LightGray);
+                Raylib.DrawRectangleV(loadBtnStart, loadBtnSize, RayColor.LightGray);
                 Raylib.DrawText(
                     boxAlgo,
-                    (int)(boxSize.Y * .1 + boxStart.Y),
-                    10,
+                    (int)(boxStart.X + (.01 * boxSize.X)),
+                    (int)(boxStart.Y + (.01 * boxSize.Y)),
                     (int)(boxSize.Y),
-                    RayColor.Green
+                    RayColor.Black
                 );
+                Raylib.DrawText(
+                    saveBtn,
+                    (int)(saveBtnStart.X + 2),
+                    (int)saveBtnStart.Y + 2,
+                    (int)(saveBtnSize.Y / 2.22),
+                    RayColor.Black
+                );
+                Raylib.DrawText(
+                    loadBtn,
+                    (int)(loadBtnStart.X + 2),
+                    (int)(loadBtnStart.Y + 2),
+                    (int)(loadBtnSize.Y / 2.22),
+                    RayColor.Black
+                );
+                Raylib.DrawFPS(10, (int)(saveBtnStart.Y + saveBtnSize.Y + 10));
             }
             Raylib.EndDrawing();
         }
