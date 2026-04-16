@@ -149,10 +149,16 @@ class RaylibGui
         string saveBtn = "Save to\nsave.json";
         Vector2 saveBtnStart = new(boxStart.X, boxStart.Y + boxSize.Y);
         Vector2 saveBtnSize = new(110, 50);
+        float saveBtnPresed = 0;
+        bool saveBtncol = false;
+        RayColor saveBtnColor;
 
         string loadBtn = "Load from\nload.json";
         Vector2 loadBtnStart = new(saveBtnStart.X + saveBtnSize.X + 10, boxStart.Y + boxSize.Y);
         Vector2 loadBtnSize = new(120, 50);
+        float loadBtnPresed = 0;
+        bool loadBtncol = false;
+        RayColor loadBtnColor;
 
         int loopCount = 0;
 
@@ -203,6 +209,7 @@ class RaylibGui
             )
             {
                 cube.serialize("save.json");
+                saveBtncol = true;
             }
             else if (
                 Raylib.IsMouseButtonPressed(MouseButton.Left)
@@ -213,6 +220,31 @@ class RaylibGui
             )
             {
                 cube = new Cube("load.json");
+                loadBtncol = true;
+            }
+
+            saveBtnColor = RayColor.Black;
+            loadBtnColor = RayColor.Black;
+            if (saveBtncol)
+            {
+                saveBtnPresed += Raylib.GetFrameTime();
+                saveBtnColor = RayColor.Lime;
+            }
+            if (loadBtncol)
+            {
+                loadBtnPresed += Raylib.GetFrameTime();
+                loadBtnColor = RayColor.Lime;
+            }
+
+            if (loadBtnPresed > 1f)
+            {
+                loadBtncol = false;
+                loadBtnPresed = 0f;
+            }
+            if (saveBtnPresed > 1f)
+            {
+                saveBtncol = false;
+                saveBtnPresed = 0f;
             }
 
             if (Raylib.IsKeyPressed(KeyboardKey.H))
@@ -368,14 +400,14 @@ class RaylibGui
                     (int)(saveBtnStart.X + 2),
                     (int)saveBtnStart.Y + 2,
                     (int)(saveBtnSize.Y / 2.22),
-                    RayColor.Black
+                    saveBtnColor
                 );
                 Raylib.DrawText(
                     loadBtn,
                     (int)(loadBtnStart.X + 2),
                     (int)(loadBtnStart.Y + 2),
                     (int)(loadBtnSize.Y / 2.22),
-                    RayColor.Black
+                    loadBtnColor
                 );
                 Raylib.DrawFPS(10, (int)(saveBtnStart.Y + saveBtnSize.Y + 10));
             }
