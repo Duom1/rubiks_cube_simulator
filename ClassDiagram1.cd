@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="rubiks_cube_simulator.Block">
+    <Position X="6.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAQACAAAWAAAIAAEIAiAAAAAgEAAQgA=</HashCode>
+      <FileName>Block.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_firstCol" />
+      <Field Name="_secondCol" />
+      <Field Name="_primaryVec" />
+      <Field Name="_secondaryVec" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="rubiks_cube_simulator.Corner">
+    <Position X="5.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAACgAAQAAAAAAWAAAAAAAAAAAAAAQgAAAQAA=</HashCode>
+      <FileName>Corner.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_thirdCol" />
+      <Field Name="_thirdVec" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="rubiks_cube_simulator.Cube">
+    <Position X="10.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQEAAAgAABAAGBAAAAEIACCAAgAIIAIAAAABAEAxAA=</HashCode>
+      <FileName>Cube.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_blocks" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="rubiks_cube_simulator.Edge">
+    <Position X="7.5" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Edge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="rubiks_cube_simulator.Program">
+    <Position X="8.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="rubiks_cube_simulator.RaylibGui">
+    <Position X="13" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAABAAACAABgAAAIAAAAgAIAAAAIAAAAA=</HashCode>
+      <FileName>RaylibGui.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cube" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="rubiks_cube_simulator.Vec3" BaseTypeListCollapsed="true">
+    <Position X="1.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAQAAAAAgAEAAAAAgEMAAIAAAABgAQAAIjA=</HashCode>
+      <FileName>Vec3.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.146" Collapsed="true" />
+  </Class>
+  <Class Name="rubiks_cube_simulator.GuiProgram">
+    <Position X="10.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GuiProgram.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="cube" />
+      <Field Name="gui" />
+    </ShowAsAssociation>
+  </Class>
+  <Interface Name="rubiks_cube_simulator.IGui">
+    <Position X="13" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAgAAAIAAAAgAAAAAAIAAAAA=</HashCode>
+      <FileName>IGui.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="rubiks_cube_simulator.Color">
+    <Position X="3.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAhAAAAAAAAAABAAAAAAAAAAAADAAAAA=</HashCode>
+      <FileName>Color.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

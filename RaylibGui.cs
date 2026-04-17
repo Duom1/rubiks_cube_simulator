@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Numerics;
 using Raylib_cs;
@@ -7,7 +8,7 @@ using RayColor = Raylib_cs.Color;
 
 namespace rubiks_cube_simulator;
 
-class RaylibGui
+class RaylibGui : IGui
 {
     private Cube _cube = new Cube(true);
 
@@ -61,6 +62,7 @@ class RaylibGui
         return new(translate.x, translate.y, translate.z);
     }
 
+    /*
     private static Vector3 translateBackCubeToRay(Vec3 pos)
     {
         var translate = (Vec3)pos.Clone();
@@ -69,6 +71,7 @@ class RaylibGui
         translate.rotateClockwiseZ();
         return new(translate.x, translate.y, translate.z);
     }
+    */
 
     private static RayColor CubeColToRay(CubeColor col)
     {
@@ -219,8 +222,15 @@ class RaylibGui
                 && Raylib.GetMouseY() > loadBtnStart.Y
             )
             {
-                cube = new Cube("load.json");
-                loadBtncol = true;
+                try
+                {
+                    cube = new Cube("load.json");
+                    loadBtncol = true;
+                }
+                catch (FileNotFoundException e)
+                {
+                    loadBtncol = false;
+                }
             }
 
             saveBtnColor = RayColor.Black;

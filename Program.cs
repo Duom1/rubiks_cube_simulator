@@ -4,10 +4,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        var cube = new Cube(true);
-        var gui = new RaylibGui();
-        gui.setCube(cube);
-        gui.createWindow();
-        gui.mainLoop();
+        GuiProgram prog = new();
+        prog.run();
     }
 }
